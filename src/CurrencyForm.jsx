@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 function CurrencyForm() {
   const [countries, setCountries] = useState([]);
   const [currencyAmount, setCurrencyAmount] = useState("$1.00");
+  const [query, setQuery] = useState("");
 
   //Populate countries on first load
   useEffect(() => {
@@ -15,14 +16,43 @@ function CurrencyForm() {
     try {
       fetchData();
     } catch (err) {
+      //implement error handling
       console.log(err);
     }
   }, []);
 
-  console.log(countries);
-
   const handleSubmit = (e) => {
     e.preventDefault();
+  };
+
+  const filteredCountries = !query
+    ? countries
+    : countries.filter((country) => {
+        if (country.currencies) {
+          return (
+            country.currencies[0].code.includes(query) ||
+            country.currencies[0].name.includes(query)
+          );
+        }
+      });
+
+  const mapCountries = () => {
+    const uniqueCurrencies = {};
+    filteredCountries.map((country) => {
+      if (country.currencies) {
+        let code = country.currencies[0].code;
+        let name = country.currencies[0].name;
+        uniqueCurrencies[code] = name;
+      }
+    });
+    const objKeys = Object.keys(uniqueCurrencies);
+    return objKeys.map((objKey) => {
+      return (
+        <li key={objKey}>
+          {objKey} - {uniqueCurrencies[objKey]}
+        </li>
+      );
+    });
   };
 
   return (
@@ -41,20 +71,35 @@ function CurrencyForm() {
           onChange={(e) => setCurrencyAmount(e.target.value)}
         ></input>
 
-        <label htmlFor="from">From</label>
-        <select id="from" name="from">
-          {countries.map((country) => {
-            if (country.currencies) {
-              return (
-                <option key={country.name}>
-                  {country.currencies[0].code} - {country.currencies[0].name}
-                </option>
-              );
-            }
-          })}
-        </select>
+        <div>
+          <label htmlFor="from">From</label>
+          <div>
+            <input
+              id="from"
+              type="text"
+              placeholder="Type to search..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            ></input>
+            <ul role="listbox">{mapCountries()}</ul>
+          </div>
+        </div>
 
-        <label htmlFor="to">To</label>
+        <div>
+          <label htmlFor="from">To</label>
+          <div>
+            <input
+              id="to"
+              type="text"
+              placeholder="Type to search..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            ></input>
+            <ul role="listbox">{mapCountries()}</ul>
+          </div>
+        </div>
+
+        {/* <label htmlFor="to">To</label>
         <select id="to" name="to">
           {countries.map((country) => {
             if (country.currencies) {
@@ -65,7 +110,7 @@ function CurrencyForm() {
               );
             }
           })}
-        </select>
+        </select> */}
         <button>Convert</button>
       </form>
     </div>
