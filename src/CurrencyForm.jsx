@@ -1,10 +1,16 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Select from "react-select";
+import CurrencyModal from "./CurrencyModal";
 
 function CurrencyForm() {
   const [countries, setCountries] = useState([]);
-  const [currencyAmount, setCurrencyAmount] = useState("$1.00");
+  const [currencyAmount, setCurrencyAmount] = useState("1.00");
+
+  const [selectedFromCurrency, setSelectedFromCurrency] = useState("");
+  const [selectedToCurrency, setSelectedToCurrency] = useState("");
+
+  const [currencyConversion, setCurrencyConversion] = useState({});
 
   //Populate countries on first load
   useEffect(() => {
@@ -23,9 +29,21 @@ function CurrencyForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const fetchCurrency = async () => {
+      const response = await fetch(
+        `https://api.exchangerate.host/convert?from=${selectedFromCurrency}&to=${selectedToCurrency}&amount=${currencyAmount}`
+      );
+      const json = await response.json();
+      setCurrencyConversion(json);
+    };
+    try {
+      fetchCurrency();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const mapCountries = () => {
+  const mapCountries = (divId) => {
     const uniqueCurrencies = {};
     countries.map((country) => {
       if (country.currencies) {
@@ -40,7 +58,17 @@ function CurrencyForm() {
       label: `${objKey} - ${uniqueCurrencies[objKey]}`,
       value: objKey,
     }));
-    return <Select options={options} />;
+    return (
+      <Select
+        inputId={divId}
+        options={options}
+        onChange={(country) =>
+          divId === "fromCurrency"
+            ? setSelectedFromCurrency(country.value)
+            : setSelectedToCurrency(country.value)
+        }
+      />
+    );
   };
 
   return (
@@ -61,14 +89,15 @@ function CurrencyForm() {
 
         <div>
           <label htmlFor="from">From</label>
-          <div>{mapCountries()}</div>
+          <div id="from-currency">{mapCountries("fromCurrency")}</div>
         </div>
 
         <div>
           <label htmlFor="from">To</label>
-          <div>{mapCountries()}</div>
+          <div id="to-currency">{mapCountries("toCurrency")}</div>
         </div>
         <button>Convert</button>
+        <CurrencyModal currencyConversion={currencyConversion} />
       </form>
     </div>
   );
