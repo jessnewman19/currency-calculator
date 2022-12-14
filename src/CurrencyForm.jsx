@@ -11,6 +11,7 @@ function CurrencyForm() {
   const [selectedToCurrency, setSelectedToCurrency] = useState("");
 
   const [currencyConversion, setCurrencyConversion] = useState({});
+  const [showCurrencyModal, setCurrencyModal] = useState(false);
 
   //Populate countries on first load
   useEffect(() => {
@@ -35,6 +36,7 @@ function CurrencyForm() {
       );
       const json = await response.json();
       setCurrencyConversion(json);
+      setCurrencyModal(true);
     };
     try {
       fetchCurrency();
@@ -97,7 +99,11 @@ function CurrencyForm() {
           <div id="to-currency">{mapCountries("toCurrency")}</div>
         </div>
         <button>Convert</button>
-        <CurrencyModal currencyConversion={currencyConversion} />
+        {showCurrencyModal === false ? (
+          <div></div>
+        ) : (
+          <CurrencyModal currencyConversion={currencyConversion} />
+        )}
       </form>
     </div>
   );
