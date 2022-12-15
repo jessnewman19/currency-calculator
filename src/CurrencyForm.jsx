@@ -5,14 +5,16 @@ import CurrencyModal from "./CurrencyModal";
 
 function CurrencyForm() {
   const [countries, setCountries] = useState([]);
-  const [currencyAmount, setCurrencyAmount] = useState("1.00");
+  const [currencyAmount, setCurrencyAmount] = useState("");
 
   const [selectedFromCurrency, setSelectedFromCurrency] = useState("");
+  const [currentCurrencySymbol, setCurrentCurrencySymbol] = useState("$");
   const [selectedToCurrency, setSelectedToCurrency] = useState("");
 
   const [currencyConversion, setCurrencyConversion] = useState({});
   const [showCurrencyModal, setCurrencyModal] = useState(false);
 
+  // console.log(countries);
   //Populate countries on first load
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +57,6 @@ function CurrencyForm() {
       }
     });
     const objKeys = Object.keys(uniqueCurrencies);
-    // console.log(objKeys);
     const options = objKeys.map((objKey) => ({
       label: `${objKey} - ${uniqueCurrencies[objKey]}`,
       value: objKey,
@@ -64,30 +65,55 @@ function CurrencyForm() {
       <Select
         inputId={divId}
         options={options}
-        onChange={(country) =>
-          divId === "fromCurrency"
-            ? setSelectedFromCurrency(country.value)
-            : setSelectedToCurrency(country.value)
-        }
+        onChange={(country) => handleSelectedCurrencies(country, divId)}
       />
     );
+  };
+
+  const handleSelectedCurrencies = (selectedCountry, divId) => {
+    if (divId === "fromCurrency") {
+      console.log(selectedCountry);
+      setSelectedFromCurrency(selectedCountry.value);
+      const foundCountry = countries.find((country) => {
+        if (country.currencies) {
+          return country.currencies[0].code === selectedCountry.value;
+        }
+      });
+      setCurrentCurrencySymbol(foundCountry.currencies[0].symbol);
+      console.log(currentCurrencySymbol);
+    } else {
+      setSelectedToCurrency(selectedCountry.value);
+    }
+  };
+
+  const handleCurrencyAmount = (e) => {
+    const regEx = /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/;
+    if (regEx.test(e.target.value)) {
+      setCurrencyAmount(e.target.value);
+    } else {
+      //Handle this error
+      console.log("ERROR! Not a float");
+    }
   };
 
   return (
     <div>
       <form onSubmit={handleSubmit}>
         <label htmlFor="amount">Amount</label>
-        <input
-          id="amount"
-          name="amount"
-          type="text"
-          placeholder="Enter amount"
-          min="0"
-          maxLength="9"
-          required
-          value={currencyAmount}
-          onChange={(e) => setCurrencyAmount(e.target.value)}
-        ></input>
+        <span>
+          {currentCurrencySymbol}
+          <input
+            id="amount"
+            name="amount"
+            type="text"
+            placeholder="Enter amount..."
+            min="0"
+            maxLength="9"
+            required
+            value={currencyAmount}
+            onChange={(e) => handleCurrencyAmount(e)}
+          ></input>
+        </span>
 
         <div>
           <label htmlFor="from">From</label>

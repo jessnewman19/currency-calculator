@@ -8,7 +8,8 @@ function CurrencyModal({ currencyConversion }) {
       <span>Conversion rate: {info.rate}</span>
       <br></br>
       <span>
-        {query.amount} {query.from} = {result} {query.to}
+        {Math.round(query.amount * 100) / 100} {query.from} =
+        {Math.round(result * 100) / 100} {query.to}
       </span>
     </div>
   );
