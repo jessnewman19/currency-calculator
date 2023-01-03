@@ -1,12 +1,24 @@
 import React from "react";
-import "./App.css";
 import CurrencyForm from "./CurrencyForm";
+import styled from "styled-components";
+
+const ContainerDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  flex-direction: row;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+`;
 
 function App() {
   return (
-    <div className="App">
+    <ContainerDiv>
       <CurrencyForm />
-    </div>
+    </ContainerDiv>
   );
 }
 
