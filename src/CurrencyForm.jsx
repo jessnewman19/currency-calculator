@@ -5,6 +5,7 @@ import CurrencyModal from "./CurrencyModal";
 import styled from "styled-components";
 
 const Button = styled.button`
+  grid-area: button;
   background: transparent;
   border-radius: 3px;
   border: 2px solid #ffa500;
@@ -19,29 +20,17 @@ const Button = styled.button`
   height: 38px;
 `;
 
-const FormWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  padding: 10px;
-  border-style: solid;
-  border-radius: 10px;
-  border-color: hsl(0, 0%, 80%);
-  border-width: 1px;
-`;
-
-const Form = styled.form`
-  display: flex;
-`;
-
 const InputDiv = styled.div`
-  display: flex;
+  grid-area: input;
 `;
 
 const Label = styled.label`
   padding-right: 10px;
   padding-top: 5px;
   font-size: large;
+`;
+const AmountDiv = styled.div`
+  position: relative;
 `;
 
 const AmountInput = styled.input`
@@ -52,12 +41,6 @@ const AmountInput = styled.input`
   border-width: 1px;
   min-height: 30px;
   margin-right: 10px;
-`;
-
-const AmountDiv = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
 `;
 
 const AmountSpan = styled.span`
@@ -85,7 +68,7 @@ function CurrencyForm() {
   const [selectedToCurrency, setSelectedToCurrency] = useState("");
 
   const [currencyConversion, setCurrencyConversion] = useState({});
-  const [showCurrencyModal, setCurrencyModal] = useState(false);
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
 
   const [inputError, setInputError] = useState("");
   const [noCurrencyError, setNoCurrencyError] = useState("");
@@ -113,7 +96,7 @@ function CurrencyForm() {
       );
       const json = await response.json();
       setCurrencyConversion(json);
-      setCurrencyModal(true);
+      setShowCurrencyModal(true);
     };
     if (selectedFromCurrency && selectedToCurrency) {
       try {
@@ -172,13 +155,18 @@ function CurrencyForm() {
     }
   };
 
-  const handleClick = () => {
-    //need to change the state of the actual react-select input
+  const handleReset = () => {
+    setCurrencyAmount("");
+    setSelectedToCurrency("");
+    setSelectedFromCurrency("");
+    setCurrentCurrencySymbol("$");
+
+    if (showCurrencyModal === true) setShowCurrencyModal(false);
   };
 
   return (
-    <FormWrapper>
-      <Form onSubmit={handleSubmit}>
+    <div id="form-wrapper">
+      <form onSubmit={handleSubmit}>
         <InputDiv>
           <Label htmlFor="amount">Amount</Label>
           <AmountDiv>
@@ -203,7 +191,7 @@ function CurrencyForm() {
           <div id="from-currency">{mapCountries("fromCurrency")}</div>
         </InputDiv>
 
-        <Button onClick={handleClick}>SWAP</Button>
+        <Button onClick={handleReset}>Reset</Button>
 
         <InputDiv>
           <Label htmlFor="from">To</Label>
@@ -218,14 +206,14 @@ function CurrencyForm() {
         </InputDiv>
 
         <Button>Convert</Button>
-      </Form>
+      </form>
       <div className="break"></div>
       {showCurrencyModal === false ? (
         <div></div>
       ) : (
         <CurrencyModal currencyConversion={currencyConversion} />
       )}
-    </FormWrapper>
+    </div>
   );
 }
 

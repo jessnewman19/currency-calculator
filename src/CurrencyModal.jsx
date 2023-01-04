@@ -3,8 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 
 const ModalDiv = styled.div`
-  display: flex;
-  flex-direction: column;
+  grid-area: modal;
 `;
 
 function CurrencyModal({ currencyConversion }) {
